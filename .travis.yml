@@ -2,7 +2,7 @@ language: julia
 os:
 - linux
 julia:
-- 0.6
+- 1.0
 notifications:
   email: false
 git:
@@ -11,35 +11,15 @@ cache:
   timeout: 1000
   directories:
   - downloads
+  - shards
 env:
   global:
   - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+  - BINARYBUILDER_SHARDS_DIR=shards
   - BINARYBUILDER_AUTOMATIC_APPLE=true
-  # Our build takes too long for one job, so split targets across multiple jobs
-  matrix:
-    - PART=1/3
-    - PART=2/3
-    - PART=3/3
+  - BINARYBUILDER_USE_CCACHE=true
 sudo: required
-jobs:
-  include:
-    - stage: regenerate build.jl
-      script: julia build_tarballs.jl --only-buildjl
-      if: tag IS present
 before_script:
-- julia -e 'Pkg.clone("https://github.com/JuliaPackaging/BinaryProvider.jl")'
-- julia -e 'Pkg.clone("https://github.com/JuliaPackaging/BinaryBuilder.jl"); Pkg.build()'
+- julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
 script:
-- julia build_tarballs.jl --part=$PART
-deploy:
-  provider: releases
-  api_key:
-      # Note; this api_key is only valid for stevengj/HDF5Builder; you need
-      # to make your own: https://docs.travis-ci.com/user/deployment/releases/
-    secure: 1Nc+CLFqKo3+29qggBO1syBlgbM7aM2Y5co45mqbSj3acJoDeKmGvSFtkMCRwyxtuaJHxllIiQWjbb+Fnon0YVaKW4YMfDjsQdypFsn/3UTsUJhQz1PcrxNW75eVs9qiJoeuwrBCmsWQtdxv1zLgZgH/Kvwl/ObW6SqdzU65ECaUwBGyWKdwTcMsYb1R4LaskRmzmjxFOPRNH6bb/7/21iXqCabalkPG/H92t3qMkx3c7a/fTnqHggl1E3o2oCaB20iE84hKc0G9TPUb6cIjbbsN1JEWaRrf90pvW5Zhcpey7iGYpN7q+v8ldCKWR7YxWJrAni3V+o59wgX4E1EhDeJK0xo3coD0JNqqke2azlkpxtGS67V2KkIUNQXHystI8mn6L/qVuE8vRO7m2WArlw4XEPq/3lh+CSnWzEfqeP4qkDoU9gEUYWgBy2H4sGAGs8iYLzT7RBYcqdseF5F0w2EwR2i/KTJOCJjpL/at/QKAFdZWLiq8681A5hik9B/2y2QZ4guYvNxjJsar3SfdIip8wMHxqHecnEKCVlk6E6J/t6i40MRSBS+iTpmkVkz/9UKyF/smkPhei2iW1pAeXW9MWf5xoqfpjDgqYtax9zcoY3wWrGv1bTNI2gMTt0gyYVY8qKNzbC/8LD4bTqXXkPQMeB3aL2JurRCmysTDuTY=
-  file_glob: true
-  file: products/*
-  skip_cleanup: true
-  on:
-    repo: stevengj/HDF5Builder
-    tags: true
+- julia build_tarballs.jl
