@@ -3,7 +3,7 @@ using BinaryBuilder, Compat
 # Collection of sources required to build HDF5.  Use the CMake download because
 # it includes appropriate zlib and szip sources, letting us build them into libhdf5.
 sources = [
-    "https://support.hdfgroup.org/ftp/HDF5/current18/src/CMake-hdf5-1.8.20.tar.gz" =>
+    "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/CMake-hdf5-1.10.5.tar.gz" =>
     "1edc45f5065597a72ecf0663786c07aa89ecb4cfbaf025496c399b5ab1b6085e"
 ]
 
